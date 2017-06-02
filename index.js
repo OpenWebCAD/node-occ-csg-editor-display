@@ -1,0 +1,1 @@
+module.exports = require("./server/calculate_display_info");
