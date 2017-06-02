@@ -1,0 +1,24 @@
+{
+  "name": "node-occ-csg-editor-display",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OpenWebCAD/node-occ-csg-editor-display.git"
+  },
+  "author": "Etienne Rossignon",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/OpenWebCAD/node-occ-csg-editor-display/issues"
+  },
+  "homepage": "https://github.com/OpenWebCAD/node-occ-csg-editor-display#readme",
+  "dependencies": {
+    "chalk": "^1.1.3",
+    "node-occ": "^0.2.0",
+    "node-occ-csg-editor": "git+https://github.com/OpenWebCAD/node-occ-csg-editor.git#master"
+  }
+}
