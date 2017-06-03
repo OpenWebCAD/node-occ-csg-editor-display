@@ -135,7 +135,7 @@ describe("CalculateDisplayInfo", function () {
 
         const g = new geometry_editor.GeometryEditor();
 
-        g.setParameters([{id: "$length", value: 10}, {id: "$thickness", value: 1}]);
+        g.setParameters([{id: "length", value: 10}, {id: "thickness", value: 1}]);
 
         const b1 = g.addBox();
         b1.point1.set(0, 0, 0);
@@ -169,8 +169,8 @@ describe("CalculateDisplayInfo", function () {
             },
             function(callback){
                 // now change some parameters
-                g.setParameter("$length",20);
-                g.setParameter("$thickness",4);
+                g.setParameter("length",20);
+                g.setParameter("thickness",4);
                 callback();
             },
             function (callback) {

@@ -20,5 +20,8 @@
     "chalk": "^1.1.3",
     "node-occ": "^0.2.0",
     "node-occ-csg-editor": "git+https://github.com/OpenWebCAD/node-occ-csg-editor.git#master"
+  },
+  "devDependencies": {
+    "should": "^11.2.1"
   }
 }

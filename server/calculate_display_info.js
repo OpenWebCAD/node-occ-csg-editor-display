@@ -80,7 +80,7 @@ function convertToScriptEx(geometryEditor) {
         return str;
     }
     function convertParameterToScript(param) {
-        return "var " + param.id + " = " + param.value + ";"
+        return "var $" + param.id + " = " + param.value + ";"
     }
 
     let lines = [];
