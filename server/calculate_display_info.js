@@ -23,7 +23,7 @@ function buildResponse(cacheBefore, data, logs) {
 
         if (dataItem.err) {
 
-            displayCache[dataItem.id] = {err: dataItem.err};
+            displayCache[dataItem.id] = {err: dataItem.err.message};
 
         } else {
 
@@ -41,13 +41,13 @@ function buildResponse(cacheBefore, data, logs) {
             try {
                 shape.name = "id_" + shape._id;
                 let mesh = occ.buildSolidMesh(shape);
-                displayCache[dataItem.id] = {hash: shape.uuid,  err: null};
+                displayCache[dataItem.id] = {hash: shape.uuid, err: null};
                 meshes[dataItem.id] = {mesh: mesh};
 
             }
             catch (err) {
-                console.log(" EXCEPTION in MESHING ", err.message);
-                displayCache[dataItem.id] = {hash: shape.uuid,  err: err};
+                //Xx console.log(" meshing shape  ", shape._id ," has failed with error ",err.message);
+                displayCache[dataItem.id] = {hash: shape.uuid, err: err.message};
                 meshes[dataItem.id] = {mesh: null};
             }
 
@@ -74,13 +74,16 @@ function convertToScriptEx(geometryEditor) {
             str += "\n    display(" + item.name + "," + item._id + ");\n";
         }
         str += "} catch(err) {\n";
-        str += "   console.log('error AA');\n";
+        str += `   console.log('building ${item.name} has failed');\n`;
         str += "   reportError(err," + item._id + ");\n";
         str += "}\n";
+
         return str;
     }
+
     function convertParameterToScript(param) {
-        return "var $" + param.id + " = " + param.value + ";"
+        const value = ( param.value === null || param.value === undefined ) ? param.defaultValue : param.value;
+        return "var $" + param.id + " = " + value + ";"
     }
 
     let lines = [];
@@ -122,6 +125,7 @@ function calculate_display_info(geometryEditor, callback) {
             process.env.data.push({shape: shape, id: metaData, hash: shape.hash});
         },
         reportError: function (err, metaData) {
+            //xx console.log("report err =",err);
             process.env.data.push({shape: null, id: metaData, hash: null, err: err});
         },
         shapeFactory: shapeFactory
@@ -136,7 +140,7 @@ function calculate_display_info(geometryEditor, callback) {
           callback(null, response);
       },
       function error_callback(err) {
-          console.log("---------------------------------------------------------------------------- ERROR", err)
+          //xx console.log("---------------------------------------------------------------------------- ERROR", err);
           callback(err);
       }
     );

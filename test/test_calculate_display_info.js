@@ -32,7 +32,7 @@ describe("CalculateDisplayInfo", function () {
         });
     });
 
-    it("should calculate display information when a entity is crashing", function (done) {
+    it("should calculate display information when building a element raises an exception", function (done) {
         const g = new geometry_editor.GeometryEditor();
         const b = g.addBox();
         b.point1.set(0, 0, 0);
@@ -43,13 +43,14 @@ describe("CalculateDisplayInfo", function () {
         calculate_display_info(g, function (err, result) {
 
             if (err) {
+                //xx console.log("err =",err);
                 return done(err);
             }
             //xx console.log("displayCache", result.displayCache);
             //xx console.log("result", result);
 
             should.not.exist(result.displayCache[b._id].hash)
-            result.displayCache[b._id].err.message.should.eql("cannot build box");
+            result.displayCache[b._id].err.should.eql("cannot build box");
 
             done();
         });
