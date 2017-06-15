@@ -89,7 +89,7 @@ function convertToScriptEx(geometryEditor) {
     let lines = [];
     const parameters = geometryEditor.getParameters();
     lines = lines.concat(parameters.map(convertParameterToScript));
-    lines = lines.concat(geometryEditor.elements.map(convertItemToScript));
+    lines = lines.concat(geometryEditor.items.map(convertItemToScript));
     return lines.join("\n");
 }
 
