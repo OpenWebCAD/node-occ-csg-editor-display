@@ -63,7 +63,6 @@ function buildResponse(cacheBefore, data, logs) {
 
 function convertToScriptEx(geometryEditor) {
 
-    assert(geometryEditor instanceof geometry_editor.GeometryEditor);
     const context = {};
 
     function convertItemToScript(item) {
