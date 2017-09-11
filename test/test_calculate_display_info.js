@@ -49,7 +49,7 @@ describe("CalculateDisplayInfo", function () {
             //xx console.log("displayCache", result.displayCache);
             //xx console.log("result", result);
 
-            should.not.exist(result.displayCache[b._id].hash)
+            should.not.exist(result.displayCache[b._id].hash);
             result.displayCache[b._id].err.should.eql("cannot build box");
 
             done();

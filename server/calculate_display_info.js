@@ -1,6 +1,6 @@
 const nodeocc = require("node-occ");
 const assert = require("assert");
-
+const _ =require("underscore");
 const geometry_editor = require("node-occ-csg-editor");
 
 const occ = nodeocc.occ;
@@ -97,6 +97,9 @@ function convertToScriptEx(geometryEditor) {
 function calculate_display_info(geometryEditor, callback) {
 
 
+    if (!_.isFunction(callback)) {
+        throw new Error("Expecting a callback");
+    }
     geometryEditor.displayCache = geometryEditor.displayCache || {};
 
 
@@ -107,7 +110,7 @@ function calculate_display_info(geometryEditor, callback) {
     }
 
 
-    const process = new scriptRunner.ScriptRunner({
+    const runner = new scriptRunner.ScriptRunner({
         csg: fast_occ,
         occ: fast_occ,
 
@@ -122,25 +125,25 @@ function calculate_display_info(geometryEditor, callback) {
                 throw new Error("Internal Error");
             }
             shape._id = metaData;
-            process.env.data.push({shape: shape, id: metaData, hash: shape.hash});
+            runner.env.data.push({shape: shape, id: metaData, hash: shape.hash});
         },
         reportError: function (err, metaData) {
             //xx console.log("report err =",err);
-            process.env.data.push({shape: null, id: metaData, hash: null, err: err});
+            runner.env.data.push({shape: null, id: metaData, hash: null, err: err});
         },
         shapeFactory: shapeFactory
     });
     const solidBuilderScript = "" + script + "";
 
-    process.run(solidBuilderScript,
+    runner.run(solidBuilderScript,
       function done_callback() {
-          const response = buildResponse(displayCache, process.env.data, process.env.logs);
+          const response = buildResponse(displayCache, runner.env.data, runner.env.logs);
 
           geometryEditor.displayCache = response.displayCache;
           callback(null, response);
       },
       function error_callback(err) {
-          //xx console.log("---------------------------------------------------------------------------- ERROR", err);
+          console.log("---------------------------------------------------------------------------- ERROR", err);
           callback(err);
       }
     );
