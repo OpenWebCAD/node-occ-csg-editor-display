@@ -7,7 +7,7 @@ const occ = nodeocc.occ;
 const shapeFactory = nodeocc.shapeFactory;
 const scriptRunner = nodeocc.scriptRunner;
 const fast_occ = nodeocc.fastBuilder.occ;
-const chalk = require('chalk');
+const chalk = require("chalk");
 const doDebug = false;
 
 function buildResponse(cacheBefore, data, logs) {
@@ -69,13 +69,14 @@ function convertToScriptEx(geometryEditor) {
 
         let str = "var " + item.name + ";\n";
         str += "try {\n";
-        str += "    " + item.name + " = " + item.toScript(context);
+        str += "    " + item.name + " = " + item.toScript(context) + "\n";
         if (item.isVisible) {
-            str += "\n    display(" + item.name + "," + item._id + ");\n";
+            str += "    display(" + item.name + ",\"" + item._id + "\");\n";
         }
         str += "} catch(err) {\n";
-        str += `   console.log('building ${item.name} has failed');\n`;
-        str += "   reportError(err," + item._id + ");\n";
+        str += `   console.log("building ${item.name} with id ${item._id} has failed");\n`;
+        str += `   console.log(" err = " + err.message);\n`;
+        str += "   reportError(err,\"" + item._id + "\");\n";
         str += "}\n";
 
         return str;
@@ -118,11 +119,11 @@ function calculate_display_info(geometryEditor, callback) {
 
         display: function (shape, metaData) {
 
-            if (typeof(metaData) !== "number") {
-                throw new Error("Internal Error");
+            if (typeof(metaData) !== "string") {
+                throw new Error("Internal Error, expecting a meta data of type string");
             }
             if (!shape instanceof occ.Solid) {
-                throw new Error("Internal Error");
+                throw new Error("Internal Error, expecting a shape");
             }
             shape._id = metaData;
             runner.env.data.push({shape: shape, id: metaData, hash: shape.hash});
@@ -144,6 +145,7 @@ function calculate_display_info(geometryEditor, callback) {
       },
       function error_callback(err) {
           console.log("---------------------------------------------------------------------------- ERROR", err);
+          console.log("solidBuilderScript = ",solidBuilderScript);
           callback(err);
       }
     );

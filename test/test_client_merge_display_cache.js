@@ -10,19 +10,29 @@ const merge_display_cache = require("../client/merge_display_cache").merge_displ
 
 /**
  *
- * @param b
+ * @param geometryEditor
  * @param cache
  * @param cache.displayCache {null|Object} the display cache returned by the previous call of
  * @param callback
  */
-function calculate_display_info_as_rest_api(b, cache, callback) {
+function calculate_display_info_as_rest_api(geometryEditor, cache, callback) {
+
+    const visibleItems = geometryEditor.items.filter(a=> a.isVisible);
+    const subset =  geometryEditor.extractSubset(visibleItems);
+    subset.should.be.instanceof(geometry_editor.GeometryEditor);
+
+    //xx    console.log(geometryEditor.convertToScript());
+    //xx    console.log('sss')
+    console.log(subset.convertToScript());
 
     if (!_.isFunction(callback)) {
         throw new Error("Expecting a callback");
     }
-    const data = geometry_editor.GeometryEditor.serialize(b);
+    const data = geometry_editor.GeometryEditor.serialize(subset);
 
-    data.should.not.match(/displayCache/);
+    data.should.not.match(/displayCache/,"displayCache is not serialized in geometryEditor");
+
+    //xx console.log(data);
 
     const bb = geometry_editor.GeometryEditor.deserialize(data);
     bb.displayCache = cache.displayCache;
@@ -60,6 +70,10 @@ describe("it should maintain a display cache up to date", function () {
         const g = geometry();
         const b = g.items[0];
         const c = g.items[1];
+        const s = g.items[2];
+        b.isVisible.should.eql(true);
+        c.isVisible.should.eql(true);
+        s.isVisible.should.eql(true);
 
         calculate_display_info_as_rest_api(g, the_cache, function (err, result) {
 
@@ -94,8 +108,9 @@ describe("it should maintain a display cache up to date", function () {
         let the_cache = {};
 
         const g = geometry();
-        const b = g.items[0];
-        const c = g.items[1];
+        const b = g.items[0]; // box
+        const c = g.items[1]; // cylinder
+        const s = g.items[2]; // shape (cut)
 
         async.series([
             function step1(callback) {
@@ -140,19 +155,23 @@ describe("it should maintain a display cache up to date", function () {
                     callback(err);
                 });
             },
-            function step3_c_becomes_invisible(callback) {
+            function step3_b_and_c_become_invisible(callback) {
                 // change cylinder
+                b.visible = false;
                 c.visible = false;
+                s.visible = false;
 
                 calculate_display_info_as_rest_api(g, the_cache, function (err, result) {
 
-                    //xx console.log("displayCache", result.displayCache);
+                    console.log("displayCache", result.displayCache);
                     //xx console.log("result", _.map(the_cache.meshes,(v)=>(" " + v.generation)).join(" | "));
                     the_cache = merge_display_cache(the_cache, result.displayCache, result.meshes);
 
                     the_cache.displayCache[b._id].hash.should.eql("13c9a8f52b4e00996dc18ffd0775f2e7d923381e");
                     the_cache.displayCache[c._id].hash.should.eql("d82e0c04fd26534fbb03183370993fa194fa3179");
+
                     Object.keys(the_cache.displayCache).length.should.eql(3);
+                    Object.keys(the_cache.meshes).length.should.eql(3);
 
                     callback(err);
                 });
@@ -163,3 +182,24 @@ describe("it should maintain a display cache up to date", function () {
     });
 
 });
+
+describe("calculating from base64 packed geometry",function() {
+
+    let geometry;
+    before(function(done){
+        //xx const base64Data = "eJy9j71uwzAMhN+FswbJSf+8FkHHZiraBoahWATKoJYESS5SBHr30oHsZPDQKdvp9N2R3O1O0EENL+h6TOF3Yyi5AAIM1CeghH0chYaaQQe1yk0W0LadG2zCALXkl9dBcxrDzDY5Z3Fp3gbqKdEPPjuLU7nlDP/HL+1Rstka9GgN2o7wXMTjqnEYMa4EUHyjSPtvDqUwoADvyCZVyBWTQRsa4uQ85IJUxXickclR1WXP1/0Bu1SWm93N0QeMkZzdjlXT7u+lYM2VH0Xfsf4s+j4vNExhPHr2JdwIUdUSs3jO09U5Sl7do9StDlLyH9BqzUwjzqvJ3PwByyHbnQ==";
+        const base64Data = "eJy9j71uwzAMhN+FswbJSf+8FkHHZiraBoahWATKoJYESS5SBHr30oHsZPDQKdvp9N2R3O1O0EENL+h6TOF3Yyi5AAIM1CeghH0chYaaQQe1yk0W0LadG2zCALXkl9dBcxrDzDY5Z3Fp3gbqKdEPPjuLU7nlDP/HL+1Rstka9GgN2o7wXMTjqnEYMa4EUHyjSPtvDqUwoADvyCZVyBWTQRsa4uQ85IJUxXickclR1WXP1/0Bu1SWm93N0QeMkZzdjlXT7u+lYM2VH0Xfsf4s+j4vNExhPHr2JdwIUdUSs3jO09U5Sl7do9StDlLyH9BqzUwjzqvJ3PwByyHbnQ==";
+
+        const data = new Buffer(base64Data, "base64");
+        geometry_editor.GeometryEditor.deserializeZ(data,function(err,_geometry){
+            geometry = _geometry;
+            done(err);
+        });
+
+    });
+
+    it("should",function(done) {
+        console.log(geometry.convertToScript());
+        done();
+    });
+})
