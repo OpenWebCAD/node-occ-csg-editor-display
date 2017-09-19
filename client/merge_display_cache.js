@@ -12,7 +12,7 @@ function merge_display_cache(cache,displayCache,meshes,options) {
     cache.meshes = cache.meshes ||{};
 
     // update
-    for (const key of Object.keys(meshes))  {
+    for (let key of Object.keys(meshes))  {
         if (meshes[key].mesh === "reuse") {
             cache.meshes[key].generation = cache.counter;
             continue;
@@ -23,7 +23,7 @@ function merge_display_cache(cache,displayCache,meshes,options) {
 
     const minGeneration = cache.counter - (options.maxAge  || 1);
     // remove stuff with some generation old
-    for (const key of Object.keys(cache.meshes)) {
+    for (let key of Object.keys(cache.meshes)) {
         const m = cache.meshes[key];
         if (m.generation <= minGeneration) {
             delete cache.meshes[key];
